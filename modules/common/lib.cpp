@@ -89,7 +89,8 @@ cv::VideoWriter invoke_writer(const std::string& video_output_path, const VideoP
     return writer;
 }
 
-cv::Mat compression_algorithm(cv::Mat& frame, const int reduction_factor) {
+cv::Mat compression_algorithm(cv::Mat& frame, const int reduction_factor)
+{
     int new_height = frame.rows / reduction_factor;
     int new_width = frame.cols / reduction_factor;
 
@@ -125,7 +126,7 @@ cv::Mat omp_compression_algorithm(cv::Mat& frame, const int reduction_factor, co
     cv::Mat compressed_frame(new_height, new_width, frame.type());
 
 
-#pragma omp parallel for num_threads(n_threads)
+    #pragma omp parallel for num_threads(n_threads)
     for (int i = 0; i < new_height; ++i) {
         for (int j = 0; j < new_width; ++j) {
             cv::Vec3i sum(0, 0, 0);

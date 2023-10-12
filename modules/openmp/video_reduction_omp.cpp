@@ -1,15 +1,14 @@
 #include <iostream>
 #include <cstdlib>
 #include <opencv4/opencv2/imgproc.hpp>
-#include <opencv4/opencv2/highgui.hpp>
 
 #include "../common/lib.cpp"
 
 
 int main(int argc, char* argv[])
 {
-    const std::string input_path  = "../resources/video/in/paint-demo.mp4";
-    const std::string output_path = "../resources/video/out/omp-compressed-paint-demo.mp4";
+    const std::string input_path  = "./resources/video/in/paint-demo.mp4";
+    const std::string output_path = "./resources/video/out/omp-compressed-paint-demo.mp4";
     int n_threads;
 
     if (argc > 1)
@@ -46,7 +45,6 @@ int main(int argc, char* argv[])
 
     cap.release();
     writer.release();
-    cv::destroyAllWindows();
 
     return EXIT_SUCCESS;
 }

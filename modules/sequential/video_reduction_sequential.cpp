@@ -7,8 +7,8 @@
 
 int main()
 {
-    const std::string input_path  = "../resources/video/in/paint-demo.mp4";
-    const std::string output_path = "../resources/video/out/seq-compressed-paint-demo.mp4";
+    const std::string input_path  = "./resources/video/in/paint-demo.mp4";
+    const std::string output_path = "./resources/video/out/seq-compressed-paint-demo.mp4";
 
     auto cap    = invoke_capture(input_path);
 
@@ -17,6 +17,7 @@ int main()
     auto writer  = invoke_writer(output_path, video_props);
 
     std::cout << "[INFO] Starting video compression..." << '\n';
+
 
     for(int i = 0; i < video_props.frame_count; i++)
     {
@@ -34,7 +35,6 @@ int main()
 
     cap.release();
     writer.release();
-    cv::destroyAllWindows();
 
     return EXIT_SUCCESS;
 }
