@@ -1,7 +1,9 @@
 # Compile the CMake files:
 echo  -e "Compiling project...\n"
+
 cmake -G "Ninja" -B "./cmake-build-debug/" -DCMAKE_BUILD_TYPE=TEST
 ninja -C "./cmake-build-debug/"
+
 
 # Execute the commands:
 
