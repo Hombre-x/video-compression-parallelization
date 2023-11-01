@@ -13,14 +13,25 @@ find_package(OpenMP REQUIRED)
 
 include_directories(${OpenCV_INCLUDE_DIRS})
 
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    message(STATUS "Building for ${CMAKE_SYSTEM_NAME}")
+    set(SEQUENTIAL_DEMO sequential_demo.out)
+    set(OMP_DEMO omp_demo.out)
+
+elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    message(STATUS "Building for ${CMAKE_SYSTEM_NAME}")
+    set(SEQUENTIAL_DEMO sequential_demo.exe)
+    set(OMP_DEMO omp_demo.exe)
+endif ()
+
 
 # Sequential demo
-add_executable(sequential_demo.out modules/sequential/video_reduction_sequential.cpp)
-target_link_libraries(sequential_demo.out common)
-target_link_libraries(sequential_demo.out ${OpenCV_LIBS})
+add_executable(SEQUENTIAL_DEMO modules/sequential/video_reduction_sequential.cpp)
+target_link_libraries(SEQUENTIAL_DEMO common)
+target_link_libraries(SEQUENTIAL_DEMO ${OpenCV_LIBS})
 
 # OpenMP demo
-add_executable(omp_demo.out modules/openmp/video_reduction_omp.cpp)
-target_link_libraries(omp_demo.out common)
-target_link_libraries(omp_demo.out ${OpenCV_LIBS})
-target_link_libraries(omp_demo.out OpenMP::OpenMP_CXX)
+add_executable(OMP_DEMO modules/openmp/video_reduction_omp.cpp)
+target_link_libraries(OMP_DEMO common)
+target_link_libraries(OMP_DEMO ${OpenCV_LIBS})
+target_link_libraries(OMP_DEMO OpenMP::OpenMP_CXX)
