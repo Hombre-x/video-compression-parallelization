@@ -1,27 +1,35 @@
 #include <iostream>
 #include <cstdlib>
-#include <opencv4/opencv2/imgproc.hpp>
+#include <opencv2/imgproc.hpp>
 
 #include "../common/lib.cpp"
 
 
 int main(int argc, char* argv[])
 {
-    const std::string input_path  = "./resources/video/in/paint-demo.mp4";
-    const std::string output_path = "./resources/video/out/omp-compressed-paint-demo.mp4";
+    std::string input_path;
+    std::string output_path;
     int n_threads;
 
-    if (argc > 1)
+    if (argc > 3)
     {
-        n_threads = atoi(argv[1]);
+        input_path  = argv[1];
+        output_path = argv[2];
+        n_threads = atoi(argv[3]);
     }
     else
     {
-        std::cout << "[WARN] Not enough arguments passed, running with maximum threads" << '\n';
+        std::cout << "[WARN] Not enough arguments passed, running with maximum threads and default paths." << '\n';
+        input_path  = "../resources/video/in/paint-demo.mp4";
+        output_path = "../resources/video/out/seq-compressed-paint-demo.mp4";
         n_threads = 12;
     }
 
+    std::vector<cv::Mat> frames(n_threads);
+
     auto cap    = invoke_capture(input_path);
+
+    int frames_written = 0;
 
     const auto video_props = VideoProps(cap);
 
@@ -29,17 +37,30 @@ int main(int argc, char* argv[])
 
     std::cout << "[INFO] Starting video compression..." << '\n';
 
-    for(int i = 0; i < video_props.frame_count; i++)
+    // Load frames
+
+    std::cout << "Total frames: " << video_props.frame_count << '\n';
+
+    do
     {
-        cv::Mat frame;
-        cv::Mat compressed_frame;
+        for (int i = 0; i < frames.size(); i++)
+        {
+            cv::Mat frame;
+            if(cap.read(frame))
+            {
+                frames[i] = frame;
+                frames_written++;
+            }
 
-        cap >> frame;
+            else break;
+        }
 
-        compressed_frame = omp_compression_algorithm(frame, 3, n_threads);
+        std::vector<cv::Mat> compressed_frames = omp_compression_algorithm(frames, 3, n_threads);
 
-        writer.write(compressed_frame);
+        for (auto& frame : compressed_frames) writer.write(frame);
+
     }
+    while (frames_written < video_props.frame_count);
 
     std::cout << "[INFO] Finishing video compression..." << '\n';
 

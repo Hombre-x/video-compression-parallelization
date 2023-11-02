@@ -29,3 +29,5 @@ echo -e "\e[33mTest with 12 threads: \e[0m"
 time ./omp_demo.out 12
 echo -e "\n"
 
+
+

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <functional>
-#include <opencv4/opencv2/opencv.hpp>
+#include <opencv2/opencv.hpp>
 #include <omp.h>
 
 /**
@@ -89,37 +89,25 @@ cv::VideoWriter invoke_writer(const std::string& video_output_path, const VideoP
     return writer;
 }
 
-cv::Mat compression_algorithm(cv::Mat& frame, const int reduction_factor)
-{
+cv::Mat compression_algorithm(cv::Mat& frame, const int reduction_factor) {
     int new_height = frame.rows / reduction_factor;
     int new_width = frame.cols / reduction_factor;
 
     cv::Mat compressed_frame(new_height, new_width, frame.type());
 
-    for (int i = 0; i < new_height; ++i) {
-        for (int j = 0; j < new_width; ++j) {
-            cv::Vec3i sum(0, 0, 0);
+    for (int i = 0; i < new_height; i++) {
+        for (int j = 0; j < new_width; j++) {
+            int original_i = i * reduction_factor;
+            int original_j = j * reduction_factor;
 
-            for (int x = i * reduction_factor; x < (i + 1) * reduction_factor; ++x) {
-                for (int y = j * reduction_factor; y < (j + 1) * reduction_factor; ++y) {
-                    // Use Vec3i for integer accumulation
-                    sum += frame.at<cv::Vec3b>(x, y);
-                }
-            }
-
-            // Calculate the average pixel value for the box
-            cv::Vec3b average_pixel = cv::Vec3b(static_cast<uchar>(sum[0] / (reduction_factor * reduction_factor)),
-                                                static_cast<uchar>(sum[1] / (reduction_factor * reduction_factor)),
-                                                static_cast<uchar>(sum[2] / (reduction_factor * reduction_factor)));
-
-            compressed_frame.at<cv::Vec3b>(i, j) = average_pixel;
+            compressed_frame.at<cv::Vec3b>(i, j) = frame.at<cv::Vec3b>(original_i, original_j);
         }
     }
 
     return compressed_frame;
 }
 
-cv::Mat omp_compression_algorithm(cv::Mat& frame, const int reduction_factor, const int n_threads) {
+cv::Mat omp_compression_algorithm_old(cv::Mat& frame, const int reduction_factor, const int n_threads) {
     int new_height = frame.rows / reduction_factor;
     int new_width = frame.cols / reduction_factor;
 
@@ -152,6 +140,22 @@ cv::Mat omp_compression_algorithm(cv::Mat& frame, const int reduction_factor, co
 
 
 
+std::vector<cv::Mat> omp_compression_algorithm(std::vector<cv::Mat>& frames,
+                                               const int reduction_factor,
+                                               const int n_threads)
+{
+    std::vector<cv::Mat> compressed_frames(12);
+
+    #pragma omp parallel num_threads(n_threads)
+    {
+        auto thread_id = omp_get_thread_num();
+
+        compressed_frames[thread_id] = compression_algorithm(frames[thread_id], reduction_factor);
+
+    }
+
+    return compressed_frames;
+}
 
 
 

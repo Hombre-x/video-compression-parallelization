@@ -1,18 +1,30 @@
 #include <iostream>
 #include <cstdlib>
-#include <opencv4/opencv2/imgproc.hpp>
-#include <opencv4/opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 
 #include "../common/lib.cpp"
 
-int main()
+int main(int argc, char* argv[])
 {
-    const std::string input_path  = "./resources/video/in/paint-demo.mp4";
-    const std::string output_path = "./resources/video/out/seq-compressed-paint-demo.mp4";
+    std::string input_path;
+    std::string output_path;
+
+    if (argc > 2)
+    {
+        input_path  = argv[1];
+        output_path = argv[2];
+    }
+    else
+    {
+        std::cout << "[WARN] Not enough arguments passed, using default video routes." << '\n';
+        input_path  = "../resources/video/in/paint-demo.mp4";
+        output_path = "../resources/video/out/seq-compressed-paint-demo.mp4";
+    }
+
 
     auto cap    = invoke_capture(input_path);
 
-    const auto video_props = VideoProps(cap);
+    const auto video_props  = VideoProps(cap);
 
     auto writer  = invoke_writer(output_path, video_props);
 
@@ -25,9 +37,7 @@ int main()
         cv::Mat compressed_frame;
 
         cap >> frame;
-
         compressed_frame = compression_algorithm(frame, 3);
-
         writer.write(compressed_frame);
     }
 
