@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.26)
 project(Video_Compression)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CUDA_STANDARD 20)
-enable_language(CUDA)
-
 
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_TEST ${CMAKE_SOURCE_DIR} )
@@ -30,10 +27,8 @@ elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     message(STATUS "Building for ${CMAKE_SYSTEM_NAME}")
     set(SEQUENTIAL_DEMO sequential_demo.exe)
     set(OMP_DEMO omp_demo.exe)
+    set(CUDA_DEMO cuda_demo.exe)
 endif ()
-
-
-set(CUDA_DEMO cuda_demo.exe)
 
 
 # Sequential demo
@@ -48,9 +43,15 @@ target_link_libraries(OMP_DEMO common)
 target_link_libraries(OMP_DEMO ${OpenCV_LIBS})
 target_link_libraries(OMP_DEMO OpenMP::OpenMP_CXX)
 
-# CUDA Demo
-add_executable(CUDA_DEMO modules/cuda/video_reduction_cuda.cu)
-set_target_properties(CUDA_DEMO PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-target_link_libraries(CUDA_DEMO common)
-target_link_libraries(CUDA_DEMO common_cuda)
-target_link_libraries(CUDA_DEMO ${OpenCV_LIBS})
+# CUDA demo
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    set(CMAKE_CUDA_STANDARD 20)
+    enable_language(CUDA)
+
+    add_executable(CUDA_DEMO modules/cuda/video_reduction_cuda.cu)
+
+    set_target_properties(CUDA_DEMO PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    target_link_libraries(CUDA_DEMO common)
+    target_link_libraries(CUDA_DEMO common_cuda)
+    target_link_libraries(CUDA_DEMO ${OpenCV_LIBS})
+endif ()
