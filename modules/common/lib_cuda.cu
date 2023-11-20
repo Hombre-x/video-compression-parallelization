@@ -41,7 +41,7 @@ cv::Mat cuda_compression_algorithm(cv::Mat& frame, const int reduction_factor) {
     cudaMemcpy(d_input, frame.ptr<uchar3>(), width * height * sizeof(uchar3), cudaMemcpyHostToDevice);
 
     // Define block and grid dimensions
-    const dim3 block(8,8);
+    const dim3 block(16,16);
 
     // Calculate grid size to cover the whole image
     const dim3 grid(cv::cuda::device::divUp(frame.cols, block.x), cv::cuda::device::divUp(frame.rows, block.y));
