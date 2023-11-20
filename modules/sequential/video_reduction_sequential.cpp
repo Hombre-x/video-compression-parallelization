@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 
     const auto video_props  = VideoProps(cap);
 
-    auto writer  = invoke_writer(output_path, video_props);
+    auto writer  = invoke_writer(output_path, video_props, 3);
 
     std::cout << "[INFO] Starting video compression..." << '\n';
 

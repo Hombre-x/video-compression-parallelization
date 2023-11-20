@@ -10,6 +10,7 @@ int main(int argc, char* argv[])
     std::string input_path;
     std::string output_path;
     int n_threads;
+    int frames_written = 0;
 
     if (argc > 3)
     {
@@ -33,7 +34,7 @@ int main(int argc, char* argv[])
 
     const auto video_props = VideoProps(cap);
 
-    auto writer  = invoke_writer(output_path, video_props);
+    auto writer  = invoke_writer(output_path, video_props, 3);
 
     std::cout << "[INFO] Starting video compression..." << '\n';
 
@@ -65,6 +66,7 @@ int main(int argc, char* argv[])
     std::cout << "[INFO] Finishing video compression..." << '\n';
 
     cap.release();
+
     writer.release();
 
     return EXIT_SUCCESS;

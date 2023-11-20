@@ -69,10 +69,10 @@ cv::VideoCapture invoke_capture(const std::string& input_video_path)
  * @param video_props Video properties
  * @return VideoWriter writer object
  */
-cv::VideoWriter invoke_writer(const std::string& video_output_path, const VideoProps& video_props)
+cv::VideoWriter invoke_writer(const std::string& video_output_path, const VideoProps& video_props, auto reduction_factor)
 {
     const auto new_size =
-            cv::Size(video_props.width / 3, video_props.height / 3);
+            cv::Size(video_props.width / reduction_factor, video_props.height / reduction_factor);
 
     cv::VideoWriter writer(
             video_output_path,
@@ -136,6 +136,49 @@ cv::Mat omp_compression_algorithm_old(cv::Mat& frame, const int reduction_factor
     }
 
     return compressed_frame;
+}
+
+/**
+ * Method to load n_threads frames into video_frames
+ * @param video_frames
+ * @param cap
+ * @param n_threads
+ * @return
+ */
+std::vector<cv::Mat> load_frames(std::vector<cv::Mat>& video_frames, cv::VideoCapture& cap)
+{
+    cv::Mat frame;
+
+    for (auto & video_frame : video_frames)
+    {
+        if(!cap.read(frame)) break;
+        video_frame = frame;
+    }
+
+    return video_frames;
+}
+
+void write_frames(std::vector<cv::Mat>& video_frames, cv::VideoWriter& writer)
+{
+    for (const auto & video_frame : video_frames)
+    {
+        writer.write(video_frame);
+    }
+}
+
+std::vector<cv::Mat> omp_compress_frames(std::vector<cv::Mat>& video_frames, int n_threads)
+{
+    std::vector<cv::Mat> compressed_frames(video_frames.size());
+
+    #pragma omp parallel num_threads(n_threads)
+    {
+        int thread_id = omp_get_thread_num();
+        cv::Mat compressed_frame;
+        compressed_frame = compression_algorithm(video_frames[thread_id], 3);
+        compressed_frames[thread_id] = compressed_frame;
+    }
+
+    return compressed_frames;
 }
 
 
