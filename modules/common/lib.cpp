@@ -3,6 +3,12 @@
 #include <opencv2/opencv.hpp>
 #include <omp.h>
 
+
+void println(auto any)
+{
+    std::cout << "[DEBUG] " << any << "\n";
+}
+
 /**
  * Applies the function f with potential side effects across
  * all the elements in the collections. It mutates the original
