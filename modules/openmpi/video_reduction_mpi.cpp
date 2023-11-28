@@ -117,19 +117,31 @@ int main(int argc, char* argv[])
 
         }
 
-        // compressed_frame = compression_algorithm(deserialized_frames[rank], 3);
-        //
-        // // Dont know how to gather
-        //
-        //
-        // if (rank == 0)
-        // {
-        //     for (int j = 0; j < n_process; j++)
-        //     {
-        //         writer.write(compressed_frames[j]);
-        //     }
-        //
-        // }
+        compressed_frame = compression_algorithm(deserialized_frames[rank], 3);
+        
+        // Dont know how to gather
+        
+        
+        if (rank == 0)
+        {
+            for (int j = 0; j < n_process; j++)
+            {
+                writer.write(compressed_frames[j]);
+            }
+
+            double process_time = end_time - start_time;
+        
+            printf("\nStarting compression using %d processes\n", numProcesses);
+
+        
+            FILE *file = fopen("tiempos_mpi_video.txt", "a");
+            if (file != NULL) {
+                fprintf(file, "Total time with %d process: %fs\n", numProcesses, end_time - start_time);
+                fclose(file);
+            } else {
+                printf("Error opening the file...");
+            }
+        }
     }
 
 
